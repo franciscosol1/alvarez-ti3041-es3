@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "nombre": "Martillo de uña 16 oz",
+    "categoria": "Herramientas manuales",
+    "precio": 12990,
+    "stock": 16
+  },
+  {
+    "id": 2,
+    "nombre": "Destornillador Phillips mediano",
+    "categoria": "Herramientas manuales",
+    "precio": 3990,
+    "stock": 34
+  },
+  {
+    "id": 3,
+    "nombre": "Set de llaves Allen 9 piezas",
+    "categoria": "Herramientas manuales",
+    "precio": 5990,
+    "stock": 24
+  },
+  {
+    "id": 4,
+    "nombre": "Alicate universal 8 pulgadas",
+    "categoria": "Herramientas manuales",
+    "precio": 8990,
+    "stock": 12
+  },
+  {
+    "id": 5,
+    "nombre": "Cinta metrica 5 metros",
+    "categoria": "Medicion",
+    "precio": 4490,
+    "stock": 0
+  },
+  {
+    "id": 6,
+    "nombre": "Nivel de burbuja 40 cm",
+    "categoria": "Medicion",
+    "precio": 7990,
+    "stock": 9
+  },
+  {
+    "id": 7,
+    "nombre": "Taladro percutor 650 W",
+    "categoria": "Herramientas electricas",
+    "precio": 45990,
+    "stock": 7
+  },
+  {
+    "id": 8,
+    "nombre": "Brocas para concreto 5 piezas",
+    "categoria": "Accesorios electricos",
+    "precio": 6990,
+    "stock": 21
+  },
+  {
+    "id": 9,
+    "nombre": "Sierra circular 1200 W",
+    "categoria": "Herramientas electricas",
+    "precio": 62990,
+    "stock": 4
+  },
+  {
+    "id": 10,
+    "nombre": "Disco de corte metal 4.5 pulgadas",
+    "categoria": "Accesorios electricos",
+    "precio": 2490,
+    "stock": 42
+  },
+  {
+    "id": 11,
+    "nombre": "Lijadora orbital 240 W",
+    "categoria": "Herramientas electricas",
+    "precio": 38990,
+    "stock": 6
+  },
+  {
+    "id": 12,
+    "nombre": "Guantes de seguridad reforzados",
+    "categoria": "Seguridad",
+    "precio": 4990,
+    "stock": 28
+  },
+  {
+    "id": 13,
+    "nombre": "Lentes de seguridad transparentes",
+    "categoria": "Seguridad",
+    "precio": 2990,
+    "stock": 31
+  },
+  {
+    "id": 14,
+    "nombre": "Casco de seguridad ajustable",
+    "categoria": "Seguridad",
+    "precio": 8990,
+    "stock": 15
+  },
+  {
+    "id": 15,
+    "nombre": "Mascarilla con filtro antipolvo",
+    "categoria": "Seguridad",
+    "precio": 3490,
+    "stock": 0
+  },
+  {
+    "id": 16,
+    "nombre": "Tornillos madera 6 x 1 pulgadas",
+    "categoria": "Fijaciones",
+    "precio": 2990,
+    "stock": 55
+  },
+  {
+    "id": 17,
+    "nombre": "Tarugos nylon 8 mm x 50 unidades",
+    "categoria": "Fijaciones",
+    "precio": 3990,
+    "stock": 38
+  },
+  {
+    "id": 18,
+    "nombre": "Clavos galvanizados 2 pulgadas",
+    "categoria": "Fijaciones",
+    "precio": 3490,
+    "stock": 26
+  },
+  {
+    "id": 19,
+    "nombre": "Pernos hexagonales surtidos",
+    "categoria": "Fijaciones",
+    "precio": 5990,
+    "stock": 19
+  },
+  {
+    "id": 20,
+    "nombre": "Silicona sellante transparente",
+    "categoria": "Adhesivos y sellantes",
+    "precio": 4290,
+    "stock": 14
+  },
+  {
+    "id": 21,
+    "nombre": "Adhesivo de montaje 300 ml",
+    "categoria": "Adhesivos y sellantes",
+    "precio": 6990,
+    "stock": 8
+  },
+  {
+    "id": 22,
+    "nombre": "Cinta aisladora negra",
+    "categoria": "Electricidad",
+    "precio": 1990,
+    "stock": 47
+  },
+  {
+    "id": 23,
+    "nombre": "Enchufe doble embutido",
+    "categoria": "Electricidad",
+    "precio": 4990,
+    "stock": 22
+  },
+  {
+    "id": 24,
+    "nombre": "Interruptor simple blanco",
+    "categoria": "Electricidad",
+    "precio": 2990,
+    "stock": 33
+  },
+  {
+    "id": 25,
+    "nombre": "Cable electrico 2.5 mm 10 metros",
+    "categoria": "Electricidad",
+    "precio": 10990,
+    "stock": 11
+  },
+  {
+    "id": 26,
+    "nombre": "Llave de paso 1/2 pulgada",
+    "categoria": "Gasfiteria",
+    "precio": 6490,
+    "stock": 5
+  },
+  {
+    "id": 27,
+    "nombre": "Flexibles para lavaplatos",
+    "categoria": "Gasfiteria",
+    "precio": 7990,
+    "stock": 10
+  },
+  {
+    "id": 28,
+    "nombre": "Cinta teflon 12 metros",
+    "categoria": "Gasfiteria",
+    "precio": 1490,
+    "stock": 44
+  },
+  {
+    "id": 29,
+    "nombre": "Rodillo para pintar 9 pulgadas",
+    "categoria": "Pintura",
+    "precio": 4990,
+    "stock": 16
+  },
+  {
+    "id": 30,
+    "nombre": "Brocha plana 2 pulgadas",
+    "categoria": "Pintura",
+    "precio": 2490,
+    "stock": 0
+  }
+]

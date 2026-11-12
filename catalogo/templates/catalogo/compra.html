@@ -1,0 +1,35 @@
+{% extends 'catalogo/base.html' %}
+
+{% block title %}Compra simulada | FerroSur{% endblock %}
+
+{% block content %}
+{% if exito %}
+    <section class="purchase-card success">
+        <p class="eyebrow">COMPRA SIMULADA</p>
+        <h1>Pedido realizado con éxito.</h1>
+        <p>Has comprado {{ cantidad }} unidad(es) de <strong>{{ producto.nombre }}</strong>.</p>
+        <div class="purchase-summary">
+            <div>
+                <span>Precio unitario</span>
+                <strong>${{ producto.precio|floatformat:0 }}</strong>
+            </div>
+            <div>
+                <span>Total</span>
+                <strong>${{ total|floatformat:0 }}</strong>
+            </div>
+            <div>
+                <span>Stock restante</span>
+                <strong>{{ producto.stock }}</strong>
+            </div>
+        </div>
+        <a class="primary-button" href="{% url 'catalogo:lista' %}">Volver al catalogo</a>
+    </section>
+{% else %}
+    <section class="purchase-card error">
+        <p class="eyebrow">COMPRA NO DISPONIBLE</p>
+        <h1>No pudimos completar tu compra.</h1>
+        <p>{{ error }}</p>
+        <a class="primary-button" href="{% url 'catalogo:detalle' producto.id %}">Volver al producto</a>
+    </section>
+{% endif %}
+{% endblock %}

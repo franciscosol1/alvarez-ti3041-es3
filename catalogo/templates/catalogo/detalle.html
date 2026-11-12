@@ -1,0 +1,35 @@
+{% extends 'catalogo/base.html' %}
+
+{% block title %}{{ producto.nombre }} | FerroSur{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'catalogo:lista' %}">&larr; Volver al catalogo</a>
+<article class="detail-card {% if producto.stock == 0 %}is-unavailable{% endif %}">
+    <div class="detail-visual">
+        <div class="detail-image" style="background-image: url('{{ producto.sprite }}'); background-position: {{ producto.bg_x }}% {{ producto.bg_y }}%;"></div>
+    </div>
+    <div class="detail-content">
+        <p class="eyebrow">{{ producto.categoria }}</p>
+        <h1>{{ producto.nombre }}</h1>
+        <div class="detail-meta">
+            <div><span>Precio</span><strong>${{ producto.precio|floatformat:0 }}</strong></div>
+            <div><span>Disponibilidad</span>
+                {% if producto.stock > 0 %}
+                    <strong class="text-available">{{ producto.stock }} unidades en stock</strong>
+                {% else %}
+                    <strong class="text-unavailable">Producto sin stock</strong>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'catalogo:compra' producto.id %}" class="purchase-form">
+            {% csrf_token %}
+            <label for="cantidad" class="quantity-label">Cantidad</label>
+            <div class="purchase-controls">
+                <input type="number" id="cantidad" name="cantidad" min="1" max="{{ producto.stock|default:1 }}" value="1" {% if producto.stock == 0 %}disabled{% endif %}>
+                <button type="submit" class="primary-button" {% if producto.stock == 0 %}disabled{% endif %}>Simular compra</button>
+            </div>
+        </form>
+    </div>
+</article>
+{% endblock %}

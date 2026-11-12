@@ -1,0 +1,54 @@
+{% extends 'catalogo/base.html' %}
+
+{% block title %}Catalogo de ferreteria | FerroSur{% endblock %}
+
+{% block content %}
+<section class="intro">
+    <div>
+        <p class="eyebrow">FERRETERIA LOCAL</p>
+        <h1>Todo lo que tu proyecto necesita.</h1>
+        <p class="lead">Explora herramientas, fijaciones y materiales disponibles en FerroSur.</p>
+    </div>
+    <div class="summary" aria-label="Resumen del catalogo">
+        <div><strong>{{ total_productos }}</strong><span>productos</span></div>
+        <div><strong>{{ productos_con_stock }}</strong><span>con stock</span></div>
+    </div>
+</section>
+
+<section class="catalog-section">
+    <div class="section-heading">
+        <h2>Catalogo completo</h2>
+        <span>{{ total_productos }} referencias</span>
+    </div>
+    <div class="product-grid">
+        {% for producto in productos %}
+        <article class="product-card {% if producto.stock == 0 %}is-unavailable{% endif %}">
+            <div class="product-image" style="background-image: url('{{ producto.sprite }}'); background-position: {{ producto.bg_x }}% {{ producto.bg_y }}%;"></div>
+            <div class="product-topline">
+                <span class="category">{{ producto.categoria }}</span>
+                {% if producto.stock > 0 %}
+                    <span class="availability available">Disponible</span>
+                {% else %}
+                    <span class="availability unavailable">Sin stock</span>
+                {% endif %}
+            </div>
+            <h3>{{ producto.nombre }}</h3>
+            <div class="product-footer">
+                <strong class="price">${{ producto.precio|floatformat:0 }}</strong>
+                {% if producto.stock > 0 %}<span class="stock">{{ producto.stock }} unidades</span>{% endif %}
+            </div>
+            <div class="card-actions">
+                <a class="detail-link" href="{% url 'catalogo:detalle' producto.id %}">Ver detalle <span aria-hidden="true">&rarr;</span></a>
+                <form method="post" action="{% url 'catalogo:compra' producto.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="primary-button" {% if producto.stock == 0 %}disabled{% endif %}>Comprar</button>
+                </form>
+            </div>
+        </article>
+        {% empty %}
+        <p>No hay productos disponibles.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
