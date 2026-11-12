@@ -20,6 +20,16 @@
         <h2>Catalogo completo</h2>
         <span>{{ total_productos }} referencias</span>
     </div>
+    {% if user.is_staff %}
+    <section class="manage-products" id="gestion-productos" aria-labelledby="create-product-heading">
+        <h3 id="create-product-heading">Agregar producto</h3>
+        <form method="post" action="{% url 'catalogo:crear_producto' %}" class="form-grid">
+            {% csrf_token %}
+            {% include 'catalogo/_producto_form_fields.html' %}
+            <button type="submit" class="primary-button">Crear producto</button>
+        </form>
+    </section>
+    {% endif %}
     <div class="product-grid">
         {% for producto in productos %}
         <article class="product-card {% if producto.stock == 0 %}is-unavailable{% endif %}">
@@ -44,6 +54,15 @@
                     <input type="hidden" name="cantidad" value="1">
                     <button type="submit" class="primary-button" {% if producto.stock == 0 %}disabled{% endif %}>Comprar</button>
                 </form>
+                {% if user.is_staff %}
+                <div class="management-actions">
+                    <a class="small-button secondary" href="{% url 'catalogo:editar_producto' producto.id %}">Editar</a>
+                    <form method="post" action="{% url 'catalogo:eliminar_producto' producto.id %}" onsubmit="return confirm('¿Eliminar el producto {{ producto.nombre|escapejs }}? Esta acción no se puede deshacer.');">
+                        {% csrf_token %}
+                        <button type="submit" class="small-button danger">Eliminar</button>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </article>
         {% empty %}

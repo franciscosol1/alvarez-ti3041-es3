@@ -7,7 +7,9 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 
+from .forms import ProductoForm
 from .models import Producto
 
 
@@ -303,38 +305,53 @@ def panel_admin(request):
 @login_required(login_url='admin:login')
 @user_passes_test(lambda user: user.is_staff, login_url='admin:login')
 def crear_producto(request):
+    form = ProductoForm(request.POST if request.method == 'POST' else None)
     if request.method != 'POST':
-        return redirect('admin:index')
+        return redirect('catalogo:lista')
+    if not form.is_valid():
+        return render_lista_productos(request, form=form, status=400)
 
-    nombre = (request.POST.get('nombre') or '').strip()
-    categoria = (request.POST.get('categoria') or '').strip()
-
-    try:
-        precio = float(request.POST.get('precio', 0) or 0)
-        stock = int(request.POST.get('stock', 0) or 0)
-    except ValueError:
-        messages.error(request, 'Precio y stock deben ser valores válidos.')
-        return redirect('admin:index')
-
-    if not nombre or not categoria or precio <= 0:
-        messages.error(request, 'Completa nombre, categoría y un precio válido.')
-        return redirect('admin:index')
-
-    producto = Producto.objects.create(
-        nombre=nombre,
-        categoria=categoria,
-        precio=round(precio, 2),
-        stock=max(0, stock),
-    )
+    producto = form.save()
     messages.success(request, f'Se creó el producto "{producto.nombre}" correctamente.')
-    return redirect('admin:index')
+    return redirect('catalogo:lista')
+
+
+@login_required(login_url='admin:login')
+@user_passes_test(lambda user: user.is_staff, login_url='admin:login')
+def editar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, pk=producto_id)
+    form = ProductoForm(request.POST if request.method == 'POST' else None, instance=producto)
+    if request.method == 'POST':
+        if form.is_valid():
+            producto = form.save()
+            messages.success(request, f'Se actualizó el producto "{producto.nombre}" correctamente.')
+            return redirect('catalogo:lista')
+        return render(request, 'catalogo/editar_producto.html', {
+            'form': form,
+            'producto': producto,
+        }, status=400)
+    return render(request, 'catalogo/editar_producto.html', {
+        'form': form,
+        'producto': producto,
+    })
+
+
+@login_required(login_url='admin:login')
+@user_passes_test(lambda user: user.is_staff, login_url='admin:login')
+@require_POST
+def eliminar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, pk=producto_id)
+    nombre = producto.nombre
+    producto.delete()
+    messages.success(request, f'Se eliminó el producto "{nombre}" correctamente.')
+    return redirect('catalogo:lista')
 
 
 @login_required(login_url='admin:login')
 @user_passes_test(lambda user: user.is_staff, login_url='admin:login')
 def actualizar_stock(request, producto_id):
     if request.method != 'POST':
-        return redirect('admin:index')
+        return redirect('catalogo:lista')
 
     producto = get_object_or_404(Producto, pk=producto_id)
 
@@ -342,12 +359,12 @@ def actualizar_stock(request, producto_id):
         nuevo_stock = int(request.POST.get('stock', producto.stock) or producto.stock)
     except ValueError:
         messages.error(request, 'El stock debe ser un número entero.')
-        return redirect('admin:index')
+        return redirect('catalogo:lista')
 
     producto.stock = max(0, nuevo_stock)
     producto.save(update_fields=['stock'])
     messages.success(request, f'Se actualizó el stock de "{producto.nombre}" a {producto.stock}.')
-    return redirect('admin:index')
+    return redirect('catalogo:lista')
 
 
 def landing(request):
@@ -356,13 +373,18 @@ def landing(request):
 
 
 def lista_productos(request):
+    return render_lista_productos(request)
+
+
+def render_lista_productos(request, form=None, status=200):
     productos = [preparar_producto(producto) for producto in Producto.objects.order_by('id')]
     contexto = {
         'productos': productos,
         'total_productos': len(productos),
         'productos_con_stock': sum(producto['stock'] > 0 for producto in productos),
+        'form': form or ProductoForm(),
     }
-    return render(request, 'catalogo/lista.html', contexto)
+    return render(request, 'catalogo/lista.html', contexto, status=status)
 
 
 def detalle_producto(request, producto_id):

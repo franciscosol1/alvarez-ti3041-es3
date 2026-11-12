@@ -16,11 +16,22 @@
             </a>
             <div class="header-actions">
                 <a class="header-catalog-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
-                <a class="header-admin-link" href="/admin/" target="_blank">Admin</a>
+                {% if user.is_staff %}
+                    <a class="header-admin-link" href="{% url 'catalogo:lista' %}#gestion-productos">Gestionar catálogo</a>
+                {% else %}
+                    <a class="header-admin-link" href="{% url 'catalogo:admin_login' %}">Admin</a>
+                {% endif %}
             </div>
         </div>
     </header>
     <main class="page-shell">
+        {% if messages %}
+            <div class="site-messages" aria-live="polite">
+                {% for message in messages %}
+                    <p class="inline-message">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
     <footer class="site-footer">

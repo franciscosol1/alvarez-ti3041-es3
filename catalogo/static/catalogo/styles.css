@@ -336,6 +336,59 @@ h1 { max-width: 650px; margin: 0; font-size: clamp(38px, 5vw, 68px); line-height
     color: var(--muted);
     padding: 16px 0;
 }
+.manage-products {
+    max-width: 760px;
+    margin: 22px 0;
+    padding: 22px;
+    background: var(--card);
+    border: 1px solid var(--line);
+}
+.manage-products h3 {
+    margin: 0 0 18px;
+    font-size: 22px;
+}
+.manage-products .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+.manage-products .form-grid > .primary-button,
+.manage-products .form-actions {
+    grid-column: 1 / -1;
+}
+.manage-products .field-row input {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    padding: 11px 12px;
+    font: 15px 'DM Sans', sans-serif;
+}
+.edit-product {
+    padding: 30px;
+}
+.edit-product h1 {
+    margin: 0 0 24px;
+    font-size: clamp(30px, 4vw, 46px);
+}
+.form-actions, .management-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.management-actions {
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+.management-actions form {
+    margin: 0;
+}
+.small-button.danger {
+    background: #fae9e5;
+    color: var(--red);
+}
+.site-messages .inline-message {
+    max-width: 760px;
+}
 .header-actions {
     display: flex;
     align-items: center;
@@ -559,6 +612,9 @@ h1 { max-width: 650px; margin: 0; font-size: clamp(38px, 5vw, 68px); line-height
     .products-table {
         display: block;
         overflow-x: auto;
+    }
+    .manage-products .form-grid {
+        grid-template-columns: 1fr;
     }
 }
 .detail-image {
