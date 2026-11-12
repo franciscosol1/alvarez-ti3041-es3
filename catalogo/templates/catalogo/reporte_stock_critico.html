@@ -1,0 +1,35 @@
+{% extends 'catalogo/base.html' %}
+
+{% block title %}Reporte de stock crítico | FerroSur{% endblock %}
+
+{% block content %}
+<section class="report-page">
+    <p class="eyebrow">REPORTES DEL CATÁLOGO</p>
+    <h1>Productos con stock crítico</h1>
+    <p class="lead">Productos con {{ umbral_stock }} unidades o menos, ordenados desde el stock más bajo.</p>
+    <div class="table-panel report-table">
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td><a href="{% url 'catalogo:detalle' producto.id %}">{{ producto.nombre }}</a></td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>${{ producto.precio|floatformat:2 }}</td>
+                    <td>{{ producto.stock }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No hay productos bajo el umbral de stock crítico.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

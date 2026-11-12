@@ -1,0 +1,35 @@
+{% extends 'catalogo/base.html' %}
+
+{% block title %}Reporte por categoría | FerroSur{% endblock %}
+
+{% block content %}
+<section class="report-page">
+    <p class="eyebrow">REPORTES DEL CATÁLOGO</p>
+    <h1>Resumen por categoría</h1>
+    <p class="lead">Cantidad de productos, precio promedio y stock total calculados desde el catálogo.</p>
+    <div class="table-panel report-table">
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Cantidad de productos</th>
+                    <th>Precio promedio</th>
+                    <th>Stock total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categorias %}
+                <tr>
+                    <td>{{ categoria.categoria }}</td>
+                    <td>{{ categoria.cantidad_registros }}</td>
+                    <td>${{ categoria.promedio_precio|floatformat:2 }}</td>
+                    <td>{{ categoria.total_stock }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No hay productos para resumir.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,9 +1,12 @@
+from decimal import Decimal
+
 from django.test import TestCase
 
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from .models import Producto
+from .views import STOCK_CRITICO_UMBRAL
 
 
 class CatalogoCrudTests(TestCase):
@@ -93,3 +96,90 @@ class CatalogoCrudTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Producto.objects.count(), 1)
+
+
+class CatalogoReportesTests(TestCase):
+    def setUp(self):
+        self.producto = Producto.objects.create(
+            nombre='Martillo',
+            categoria='Herramientas',
+            precio='12.50',
+            stock=5,
+        )
+
+    def test_category_report_uses_database_aggregates(self):
+        Producto.objects.create(
+            nombre='Alicate',
+            categoria='Herramientas',
+            precio='20.00',
+            stock=0,
+        )
+        Producto.objects.create(
+            nombre='Cable',
+            categoria='Electricidad',
+            precio='8.00',
+            stock=9,
+        )
+
+        response = self.client.get(reverse('catalogo:reporte_categorias'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            list(response.context['categorias']),
+            [
+                {
+                    'categoria': 'Electricidad',
+                    'cantidad_registros': 1,
+                    'promedio_precio': Decimal('8'),
+                    'total_stock': 9,
+                },
+                {
+                    'categoria': 'Herramientas',
+                    'cantidad_registros': 2,
+                    'promedio_precio': Decimal('16.25'),
+                    'total_stock': 5,
+                },
+            ],
+        )
+        self.assertContains(response, 'Cantidad de productos')
+        self.assertContains(response, '$16.25')
+
+    def test_critical_stock_report_filters_and_orders_database_records(self):
+        Producto.objects.create(
+            nombre='Nivel',
+            categoria='Herramientas',
+            precio='10.00',
+            stock=STOCK_CRITICO_UMBRAL,
+        )
+        Producto.objects.create(
+            nombre='Alicate',
+            categoria='Herramientas',
+            precio='5.00',
+            stock=0,
+        )
+        Producto.objects.create(
+            nombre='Taladro',
+            categoria='Herramientas',
+            precio='80.00',
+            stock=STOCK_CRITICO_UMBRAL + 1,
+        )
+
+        response = self.client.get(reverse('catalogo:reporte_stock_critico'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            list(response.context['productos']),
+            [
+                Producto.objects.get(nombre='Alicate'),
+                self.producto,
+                Producto.objects.get(nombre='Nivel'),
+            ],
+        )
+        self.assertNotContains(response, 'Taladro')
+        self.assertContains(response, f'{STOCK_CRITICO_UMBRAL} unidades o menos')
+
+    def test_base_navigation_links_to_both_reports(self):
+        response = self.client.get(reverse('catalogo:lista'))
+
+        self.assertContains(response, reverse('catalogo:reporte_categorias'))
+        self.assertContains(response, reverse('catalogo:reporte_stock_critico'))

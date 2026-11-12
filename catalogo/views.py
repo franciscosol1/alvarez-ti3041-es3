@@ -5,6 +5,7 @@ from urllib.parse import quote
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Avg, Count, Sum
 from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
@@ -14,6 +15,7 @@ from .models import Producto
 
 
 DATOS_PATH = Path(__file__).parent / 'data' / 'productos.json'
+STOCK_CRITICO_UMBRAL = 5
 
 IMAGENES_PRODUCTOS = {
   1: 'martillo.png',
@@ -374,6 +376,27 @@ def landing(request):
 
 def lista_productos(request):
     return render_lista_productos(request)
+
+
+def reporte_categorias(request):
+    categorias = (
+        Producto.objects.values('categoria')
+        .annotate(
+            cantidad_registros=Count('id'),
+            promedio_precio=Avg('precio'),
+            total_stock=Sum('stock'),
+        )
+        .order_by('categoria')
+    )
+    return render(request, 'catalogo/reporte_categorias.html', {'categorias': categorias})
+
+
+def reporte_stock_critico(request):
+    productos = Producto.objects.filter(stock__lte=STOCK_CRITICO_UMBRAL).order_by('stock', 'nombre')
+    return render(request, 'catalogo/reporte_stock_critico.html', {
+        'productos': productos,
+        'umbral_stock': STOCK_CRITICO_UMBRAL,
+    })
 
 
 def render_lista_productos(request, form=None, status=200):
