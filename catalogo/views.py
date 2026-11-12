@@ -10,8 +10,8 @@ from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .forms import ProductoForm
-from .models import Producto
+from .forms import ConsultaClienteForm, ProductoForm
+from .models import ConsultaCliente, Producto
 
 
 DATOS_PATH = Path(__file__).parent / 'data' / 'productos.json'
@@ -399,6 +399,35 @@ def reporte_stock_critico(request):
     })
 
 
+def consulta_cliente(request):
+    if request.method == 'POST':
+        form = ConsultaClienteForm(request.POST)
+    else:
+        initial = {}
+        try:
+            producto_id = int(request.GET.get('producto', ''))
+        except ValueError:
+            producto_id = None
+        if producto_id and Producto.objects.filter(pk=producto_id).exists():
+            initial['producto_interes'] = producto_id
+        form = ConsultaClienteForm(initial=initial)
+
+    if request.method == 'POST' and form.is_valid():
+        consulta = form.save()
+        return render(request, 'catalogo/consulta_cliente.html', {
+            'form': ConsultaClienteForm(),
+            'consulta_enviada': True,
+            'consulta': consulta,
+        })
+
+    return render(
+        request,
+        'catalogo/consulta_cliente.html',
+        {'form': form},
+        status=400 if request.method == 'POST' else 200,
+    )
+
+
 def render_lista_productos(request, form=None, status=200):
     productos = [preparar_producto(producto) for producto in Producto.objects.order_by('id')]
     contexto = {
@@ -412,7 +441,29 @@ def render_lista_productos(request, form=None, status=200):
 
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
-    return render(request, 'catalogo/detalle.html', {'producto': preparar_producto(producto)})
+    productos_visitados = request.session.get('productos_visitados', [])
+    if not isinstance(productos_visitados, list):
+        productos_visitados = []
+
+    productos_visitados = [
+        producto_id_visto
+        for producto_id_visto in productos_visitados
+        if isinstance(producto_id_visto, int) and producto_id_visto != producto.pk
+    ]
+    productos_visitados.insert(0, producto.pk)
+    productos_visitados = productos_visitados[:3]
+    request.session['productos_visitados'] = productos_visitados
+
+    productos_por_id = Producto.objects.in_bulk(productos_visitados)
+    historial_productos = [
+        preparar_producto(productos_por_id[visto_id])
+        for visto_id in productos_visitados
+        if visto_id in productos_por_id
+    ]
+    return render(request, 'catalogo/detalle.html', {
+        'producto': preparar_producto(producto),
+        'historial_productos': historial_productos,
+    })
 
 
 def simular_compra(request, producto_id):

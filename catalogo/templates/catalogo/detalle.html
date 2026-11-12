@@ -30,6 +30,17 @@
                 <button type="submit" class="primary-button" {% if producto.stock == 0 %}disabled{% endif %}>Simular compra</button>
             </div>
         </form>
+        <p><a class="detail-link" href="{% url 'catalogo:consulta_cliente' %}?producto={{ producto.id }}">Consultar por este producto</a></p>
     </div>
 </article>
+{% if historial_productos %}
+<section class="recent-products" aria-labelledby="recent-products-heading">
+    <h2 id="recent-products-heading">Productos vistos recientemente</h2>
+    <ul>
+        {% for producto_visto in historial_productos %}
+        <li><a href="{% url 'catalogo:detalle' producto_visto.id %}">{{ producto_visto.nombre }}</a></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
 {% endblock %}

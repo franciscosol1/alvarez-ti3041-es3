@@ -18,6 +18,7 @@
                 <a class="header-catalog-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
                 <a class="header-catalog-link" href="{% url 'catalogo:reporte_categorias' %}">Reporte por categoría</a>
                 <a class="header-catalog-link" href="{% url 'catalogo:reporte_stock_critico' %}">Stock crítico</a>
+                <a class="header-catalog-link" href="{% url 'catalogo:consulta_cliente' %}">Contacto</a>
                 {% if user.is_staff %}
                     <a class="header-admin-link" href="{% url 'catalogo:lista' %}#gestion-productos">Gestionar catálogo</a>
                 {% else %}

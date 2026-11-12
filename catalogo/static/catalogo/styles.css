@@ -402,6 +402,48 @@ h1 { max-width: 650px; margin: 0; font-size: clamp(38px, 5vw, 68px); line-height
     color: var(--green);
     font-weight: 700;
 }
+.contact-page {
+    margin: 0 auto;
+}
+.contact-page h1 {
+    margin: 0 0 16px;
+    font-size: clamp(32px, 4vw, 48px);
+}
+.contact-page > .lead {
+    margin: 0 0 24px;
+}
+.contact-page .form-grid {
+    grid-template-columns: 1fr;
+}
+.contact-page input, .contact-page select, .contact-page textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    padding: 11px 12px;
+    font: 15px 'DM Sans', sans-serif;
+}
+.recent-products {
+    max-width: 980px;
+    margin-top: 30px;
+    padding: 20px 24px;
+    background: var(--card);
+    border: 1px solid var(--line);
+}
+.recent-products h2 {
+    margin-top: 0;
+}
+.recent-products ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin: 0;
+    padding-left: 20px;
+}
+.recent-products a {
+    color: var(--green);
+    font-weight: 700;
+}
 .header-actions {
     display: flex;
     flex-wrap: wrap;

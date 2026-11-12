@@ -1,11 +1,12 @@
 from decimal import Decimal
 
+from django.contrib import admin
 from django.test import TestCase
 
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from .models import Producto
+from .models import ConsultaCliente, Producto
 from .views import STOCK_CRITICO_UMBRAL
 
 
@@ -183,3 +184,115 @@ class CatalogoReportesTests(TestCase):
 
         self.assertContains(response, reverse('catalogo:reporte_categorias'))
         self.assertContains(response, reverse('catalogo:reporte_stock_critico'))
+
+
+class ConsultaClienteTests(TestCase):
+    def setUp(self):
+        self.producto = Producto.objects.create(
+            nombre='Martillo',
+            categoria='Herramientas',
+            precio='12.50',
+            stock=5,
+        )
+
+    def test_customer_inquiries_are_registered_in_admin(self):
+        self.assertTrue(admin.site.is_registered(ConsultaCliente))
+
+    def test_valid_contact_submission_is_saved_and_confirmed(self):
+        response = self.client.post(reverse('catalogo:consulta_cliente'), {
+            'nombre': 'Ana Pérez',
+            'correo': 'ana@example.com',
+            'mensaje': 'Quiero saber más sobre este producto.',
+            'producto_interes': str(self.producto.pk),
+        })
+
+        self.assertEqual(response.status_code, 200)
+        consulta = ConsultaCliente.objects.get()
+        self.assertEqual(consulta.nombre, 'Ana Pérez')
+        self.assertEqual(consulta.producto_interes, self.producto)
+        self.assertIsNotNone(consulta.fecha)
+        self.assertContains(response, 'Gracias, Ana Pérez.')
+
+    def test_invalid_email_and_short_required_fields_are_rejected(self):
+        response = self.client.post(reverse('catalogo:consulta_cliente'), {
+            'nombre': 'A',
+            'correo': 'no-es-un-correo',
+            'mensaje': 'corto',
+            'producto_interes': '',
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(ConsultaCliente.objects.count(), 0)
+        self.assertContains(response, 'El nombre debe tener al menos 2 caracteres.', status_code=400)
+        self.assertContains(response, 'Ingresa un correo electrónico válido.', status_code=400)
+        self.assertContains(response, 'El mensaje debe tener al menos 10 caracteres.', status_code=400)
+
+    def test_required_contact_fields_cannot_be_empty(self):
+        response = self.client.post(reverse('catalogo:consulta_cliente'), {})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(ConsultaCliente.objects.count(), 0)
+        self.assertContains(response, 'Ingresa tu nombre.', status_code=400)
+        self.assertContains(response, 'Ingresa tu correo electrónico.', status_code=400)
+        self.assertContains(response, 'Escribe tu mensaje.', status_code=400)
+
+    def test_contact_submission_requires_csrf_token(self):
+        csrf_client = self.client_class(enforce_csrf_checks=True)
+        response = csrf_client.post(reverse('catalogo:consulta_cliente'), {
+            'nombre': 'Ana Pérez',
+            'correo': 'ana@example.com',
+            'mensaje': 'Quiero saber más sobre este producto.',
+            'producto_interes': '',
+        })
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ConsultaCliente.objects.count(), 0)
+
+    def test_contact_form_accepts_valid_csrf_token(self):
+        csrf_client = self.client_class(enforce_csrf_checks=True)
+        form_response = csrf_client.get(reverse('catalogo:consulta_cliente'))
+        csrf_token = csrf_client.cookies['csrftoken'].value
+
+        response = csrf_client.post(reverse('catalogo:consulta_cliente'), {
+            'csrfmiddlewaretoken': csrf_token,
+            'nombre': 'Ana Pérez',
+            'correo': 'ana@example.com',
+            'mensaje': 'Quiero saber más sobre este producto.',
+            'producto_interes': '',
+        })
+
+        self.assertEqual(form_response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ConsultaCliente.objects.count(), 1)
+
+    def test_contact_form_can_be_prefilled_with_product_from_detail_link(self):
+        response = self.client.get(
+            reverse('catalogo:consulta_cliente'),
+            {'producto': self.producto.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'<option value="{self.producto.pk}" selected>')
+
+    def test_product_detail_tracks_only_the_three_most_recent_products(self):
+        productos = [self.producto]
+        for nombre in ('Alicate', 'Taladro', 'Nivel'):
+            productos.append(Producto.objects.create(
+                nombre=nombre,
+                categoria='Herramientas',
+                precio='10.00',
+                stock=2,
+            ))
+
+        for producto in productos:
+            response = self.client.get(reverse('catalogo:detalle', args=[producto.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.client.session['productos_visitados'],
+            [productos[3].pk, productos[2].pk, productos[1].pk],
+        )
+        self.assertEqual(
+            [producto['nombre'] for producto in response.context['historial_productos']],
+            ['Nivel', 'Taladro', 'Alicate'],
+        )
